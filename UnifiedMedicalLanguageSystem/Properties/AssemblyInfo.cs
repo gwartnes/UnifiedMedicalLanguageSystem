@@ -7,11 +7,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("UnifiedMedicalLanguageSystem")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A library for interacting with the UMLS API")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("LHP")]
+[assembly: AssemblyCompany("Seth Gwartney")]
 [assembly: AssemblyProduct("UnifiedMedicalLanguageSystem")]
-[assembly: AssemblyCopyright("Copyright © LHP 2016")]
+[assembly: AssemblyCopyright("Copyright © Seth Gwartney 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: NeutralResourcesLanguage("en")]

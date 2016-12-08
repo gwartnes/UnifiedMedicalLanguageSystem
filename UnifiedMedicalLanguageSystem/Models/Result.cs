@@ -3,7 +3,7 @@ using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 
-namespace UnifiedMedicalLanguageSystem.Models
+namespace UnifiedMedicalLanguageSystem
 {
     public class SearchResult : IResult
     {

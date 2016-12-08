@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Amoenus.PclTimer;
 
-namespace UnifiedMedicalLanguageSystem.Models
+namespace UnifiedMedicalLanguageSystem
 {
     internal class TicketGrantingTicket
     {

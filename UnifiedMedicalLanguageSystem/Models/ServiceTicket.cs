@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 
 
-namespace UnifiedMedicalLanguageSystem.Models
+namespace UnifiedMedicalLanguageSystem
 {
     internal class ServiceTicket
     {

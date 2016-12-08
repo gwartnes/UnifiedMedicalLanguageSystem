@@ -1,12 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnifiedMedicalLanguageSystem.Models;
-using UnifiedMedicalLanguageSystem.Models.Enums;
 
 namespace UnifiedMedicalLanguageSystem.TestClient
 {
@@ -20,7 +14,7 @@ namespace UnifiedMedicalLanguageSystem.TestClient
 
         static void Main(string[] args)
         {
-            umls = UMLS.CreateAsync("3c969069-e0fd-46d0-8cef-4c1f59e97dfe").GetAwaiter().GetResult();
+            umls = UMLS.CreateAsync("3c969069-e0fd-46d0-8cef-4c1f59e97dfe", RootSource.CSP).GetAwaiter().GetResult();
 
             while (selectedNumber != 0)
             {
@@ -62,7 +56,7 @@ namespace UnifiedMedicalLanguageSystem.TestClient
         {
             w("Enter a search term: ");
             var term = r();
-            var result = umls.SimpleSearch(term, false, RootSource.MTH, RootSource.MSH).GetAwaiter().GetResult() as SingleQueryResponse;
+            var result = umls.SimpleSearch(term, false).GetShallowSearchResults().GetAwaiter().GetResult() as SingleQueryResponse;
             w(JsonConvert.SerializeObject(result, Formatting.Indented, new StringEnumConverter()));
         }
 

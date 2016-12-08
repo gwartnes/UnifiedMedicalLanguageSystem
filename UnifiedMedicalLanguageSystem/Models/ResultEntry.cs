@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 
-namespace UnifiedMedicalLanguageSystem.Models
+namespace UnifiedMedicalLanguageSystem
 {
     public class ShallowResultEntry : IResultEntry
     {

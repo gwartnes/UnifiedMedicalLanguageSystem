@@ -9,6 +9,6 @@ namespace UnifiedMedicalLanguageSystem
     public static class Constants
     {
         public const string BaseURI = "https://uts-ws.nlm.nih.gov/rest";
-        public const string SimpleSearchURI = BaseURI + "/search/current?string={0}&ticket={1}";
+        public const string SimpleSearchURI = BaseURI + "/search/current";
     }
 }

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UnifiedMedicalLanguageSystem.Models.Enums
+namespace UnifiedMedicalLanguageSystem
 {
     [AttributeUsage(AttributeTargets.Field)]
     sealed class RootSourceInfoAttribute : Attribute
@@ -21,7 +21,7 @@ namespace UnifiedMedicalLanguageSystem.Models.Enums
 
     public static class EnumExtensions
     {
-        public static string GetSourceCode(this RootSource rootSource)
+        public static string GetSourceAbbreviation(this RootSource rootSource)
         {
             var attribute = typeof(RootSource);
             var fieldInfo = attribute.GetRuntimeField(rootSource.ToString());

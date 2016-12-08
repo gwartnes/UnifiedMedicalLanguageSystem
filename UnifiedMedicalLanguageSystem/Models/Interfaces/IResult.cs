@@ -1,4 +1,4 @@
-﻿namespace UnifiedMedicalLanguageSystem.Models
+﻿namespace UnifiedMedicalLanguageSystem
 {
     public interface IResult
     {

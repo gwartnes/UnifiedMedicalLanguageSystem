@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("UnifiedMedicalLanguageSystem.TestClient")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("LHP")]
+[assembly: AssemblyCompany("Seth Gwartney")]
 [assembly: AssemblyProduct("UnifiedMedicalLanguageSystem.TestClient")]
-[assembly: AssemblyCopyright("Copyright © LHP 2016")]
+[assembly: AssemblyCopyright("Copyright © Seth Gwartney 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
