@@ -1,23 +1,14 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.QueryStringDotNET;
 
 namespace UnifiedMedicalLanguageSystem
 {
     public class UMLS
     {
         internal TicketGrantingTicket TGT { get; set; }
-        private RootSource[] _sources = null;
-
-        private UMLS(TicketGrantingTicket tgt, RootSource[] rootSources)
-        {
-            TGT = tgt;
-            _sources = rootSources;
-        }
 
         private UMLS(TicketGrantingTicket tgt)
         {
@@ -30,7 +21,7 @@ namespace UnifiedMedicalLanguageSystem
         /// <param name="apiKey">Your API key. Can be found after logging in using the credentials you set up at https://uts.nlm.nih.gov//uts.html#profile </param>
         /// <param name="rootSources">All the UMLS root sources (RSABs) to use when searching and retrieving information from UMLS</param>
         /// <returns>An awaitable Task which represents </returns>
-        public static async Task<UMLS> CreateAsync(string apiKey, params RootSource[] rootSources)
+        public static async Task<UMLS> CreateAsync(string apiKey)
         {
             if (string.IsNullOrWhiteSpace(apiKey))
             {
@@ -48,27 +39,16 @@ namespace UnifiedMedicalLanguageSystem
             {
                 throw new Exception("Invalid TGT/ST.");
             }
-            if (rootSources != null && rootSources.Length > 0)
-            {
-                return new UMLS(tgt, rootSources);
-            }
             return new UMLS(tgt);
         }
 
-        public async Task<SingleQueryResponse> SimpleSearch(string term, bool getDeepResults)
+        public async Task<SingleQueryResponse> Search(string term, SearchOptions options = null)
         {
             string searchResultRaw;
-            var queryString = new QueryString();
             using (var client = new HttpClient())
             {
                 var serviceTicket = await TGT.GetServiceTicket();
-                queryString.Add("search", term);
-                queryString.Add("ticket", serviceTicket.TicketKey);
-                if (_sources != null && _sources.Length > 0)
-                {
-                   queryString.Add("sabs", string.Join(",", _sources.Select(s => s.GetSourceAbbreviation())));
-                }
-                var response = await client.GetAsync(Constants.SimpleSearchURI + queryString.ToString());
+                var response = await client.GetAsync(UMLSURIBuilder.SearchURI(serviceTicket.TicketKey, term, options));
                 if (!response.IsSuccessStatusCode)
                 {
                     return null;
@@ -76,52 +56,15 @@ namespace UnifiedMedicalLanguageSystem
 
                 searchResultRaw = await response.Content.ReadAsStringAsync();
             }
-            var searchObject = await Task.Factory.StartNew(() => JsonConvert.DeserializeObject<SingleQueryResponse>(searchResultRaw, new SingleQueryResponseConverter(), new SearchResultConverter(), new ShallowSearchResultConverter()));
-            if (getDeepResults)
-            {
-                var clrSearchResults = (searchObject.Result as SearchResult).Results;
-                for (int i = 0; i < clrSearchResults.Length ; i++)
-                {
-                    queryString = new QueryString();
-                    using (var client = new HttpClient())
-                    {
-                        var serviceTicket = await TGT.GetServiceTicket();
-                        queryString.Add("ticket", serviceTicket.TicketKey);
-                        var response = await client.GetAsync((clrSearchResults[i] as ShallowResultEntry).Uri + queryString.ToString());
-                        if (!response.IsSuccessStatusCode)
-                        {
-                            return null;
-                        }
-
-                        var jsonConcept = await response.Content.ReadAsStringAsync();
-                        var clrConcept = await Task.Factory.StartNew(() => JsonConvert.DeserializeObject<IQueryResponse>(jsonConcept, new SingleQueryResponseConverter(), new ConceptResultConverter()));
-                        clrSearchResults[i] = new DeepResultEntry
-                        {
-                            UI = clrSearchResults[i].UI,
-                            RootSource = clrSearchResults[i].RootSource,
-                            Name = clrSearchResults[i].Name,
-                            Concept = clrConcept
-                        };
-                    }
-                }
-                (searchObject.Result as SearchResult).Results = clrSearchResults;
-            }      
-            return searchObject;
+            return await Task.Factory.StartNew(() => JsonConvert.DeserializeObject<SingleQueryResponse>(searchResultRaw, new SingleQueryResponseConverter(), new SearchResultConverter(), new SearchEntryResultConverter()));
         }
 
-        public async Task<IQueryResponse> Concept(string cuiLink)
+        public async Task<IQueryResponse> Concept(string cui)
         {
-            var queryString = new QueryString();
-            var serviceTicket = await TGT.GetServiceTicket();
             using (var client = new HttpClient())
             {
-                queryString.Add("ticket", serviceTicket.TicketKey);
-                var link = new Uri(cuiLink + queryString.ToString());
-                if (!link.IsWellFormedOriginalString())
-                {
-                    return null;
-                }
-                var response = await client.GetAsync(link);
+                var serviceTicket = await TGT.GetServiceTicket();
+                var response = await client.GetAsync(UMLSURIBuilder.ConceptUIURI(cui, serviceTicket.TicketKey));
                 if (!response.IsSuccessStatusCode)
                 {
                     return null;
@@ -131,19 +74,12 @@ namespace UnifiedMedicalLanguageSystem
             }
         }
 
-        public async Task<IQueryResponse> Concept(Uri cuiLink)
+        public async Task<IQueryResponse> Definitions(string cui)
         {
-            return await Concept(cuiLink.ToString());
-        }
-
-        public async Task<IQueryResponse> Definitions(string definitionsLink)
-        {
-            var queryString = new QueryString();
-            var serviceTicket = await TGT.GetServiceTicket();
             using (var client = new HttpClient())
             {
-                queryString.Add("ticket", serviceTicket.TicketKey);
-                var response = await client.GetAsync(definitionsLink + queryString.ToString());
+                var serviceTicket = await TGT.GetServiceTicket();
+                var response = await client.GetAsync(UMLSURIBuilder.DefintionsURI(cui, serviceTicket.TicketKey));
                 if (!response.IsSuccessStatusCode)
                 {
                     return null;
@@ -151,11 +87,6 @@ namespace UnifiedMedicalLanguageSystem
                 var resultRaw = await response.Content.ReadAsStringAsync();
                 return await Task.Factory.StartNew(() => JsonConvert.DeserializeObject<IQueryResponse>(resultRaw, new CollectionQueryResponseConverter(), new DefintionResultConverter()));
             }
-        }
-
-        public async Task<IQueryResponse> Definitions(Uri definitionsLink)
-        {
-            return await Definitions(definitionsLink.ToString());
         }
     }
 
@@ -183,11 +114,11 @@ namespace UnifiedMedicalLanguageSystem
         }
     }
 
-    internal class ShallowSearchResultConverter : CustomCreationConverter<IResultEntry>
+    internal class SearchEntryResultConverter : CustomCreationConverter<IResultEntry>
     {
         public override IResultEntry Create(Type objectType)
         {
-            return new ShallowResultEntry();
+            return new ResultEntry();
         }
     }
 

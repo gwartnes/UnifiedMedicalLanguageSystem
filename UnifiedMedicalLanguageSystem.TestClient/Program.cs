@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System;
+using System.Collections.Generic;
 
 namespace UnifiedMedicalLanguageSystem.TestClient
 {
@@ -14,7 +15,7 @@ namespace UnifiedMedicalLanguageSystem.TestClient
 
         static void Main(string[] args)
         {
-            umls = UMLS.CreateAsync("3c969069-e0fd-46d0-8cef-4c1f59e97dfe", RootSource.CSP).GetAwaiter().GetResult();
+            umls = UMLS.CreateAsync("3c969069-e0fd-46d0-8cef-4c1f59e97dfe").GetAwaiter().GetResult();
 
             while (selectedNumber != 0)
             {
@@ -38,17 +39,17 @@ namespace UnifiedMedicalLanguageSystem.TestClient
 
         private static void Definitions()
         {
-            w("Enter a definition link: ");
-            var definitionLink = r();
-            var result = umls.Definitions(definitionLink).GetAwaiter().GetResult() as CollectionQueryResponse;
+            w("Enter a concept UI: ");
+            var conceptUi = r();
+            var result = umls.Definitions(conceptUi).GetAwaiter().GetResult() as CollectionQueryResponse;
             w(JsonConvert.SerializeObject(result, Formatting.Indented, new StringEnumConverter()));
         }
 
         private static void Concept()
         {
-            w("Enter a concept link: ");
-            var conceptLink = r();
-            var result = umls.Concept(conceptLink).GetAwaiter().GetResult() as SingleQueryResponse;
+            w("Enter a concept UI: ");
+            var conceptUi = r();
+            var result = umls.Concept(conceptUi).GetAwaiter().GetResult() as SingleQueryResponse;
             w(JsonConvert.SerializeObject(result, Formatting.Indented, new StringEnumConverter()));
         }
 
@@ -56,7 +57,7 @@ namespace UnifiedMedicalLanguageSystem.TestClient
         {
             w("Enter a search term: ");
             var term = r();
-            var result = umls.SimpleSearch(term, false).GetShallowSearchResults().GetAwaiter().GetResult() as SingleQueryResponse;
+            var result = umls.Search(term, new SearchOptions(RootSource.CSP) { PageSize = 10 }).GetShallowSearchResults().GetAwaiter().GetResult() as IEnumerable<ResultEntry>;
             w(JsonConvert.SerializeObject(result, Formatting.Indented, new StringEnumConverter()));
         }
 

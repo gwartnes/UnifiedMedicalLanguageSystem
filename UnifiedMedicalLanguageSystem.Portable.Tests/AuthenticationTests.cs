@@ -22,7 +22,7 @@ namespace UnifiedMedicalLanguageSystem.Portable.Tests
         public async Task SimpleSearchJsonToObjectResultSuccessful(string searchTerm)
         {
             var umls = await UMLS.CreateAsync("3c969069-e0fd-46d0-8cef-4c1f59e97dfe");
-            var result = await umls.SimpleSearch(searchTerm, false);
+            var result = await umls.Search(searchTerm);
             Assert.NotNull(result);
         }
     }
