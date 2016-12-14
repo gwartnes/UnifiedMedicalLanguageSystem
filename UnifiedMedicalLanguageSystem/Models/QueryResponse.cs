@@ -24,7 +24,7 @@ namespace UnifiedMedicalLanguageSystem
 
     public static class QueryExtensions
     {
-        public static IEnumerable<ResultEntry> GetShallowSearchResults(this SingleQueryResponse queryResponse)
+        public static IEnumerable<ResultEntry> GetSearchResultEntries(this SingleQueryResponse queryResponse)
         {
             if (queryResponse == null)
             {
@@ -46,9 +46,9 @@ namespace UnifiedMedicalLanguageSystem
             return searchResults.Select(r => r as ResultEntry);
         }
 
-        public static Task<IEnumerable<ResultEntry>> GetShallowSearchResults(this Task<SingleQueryResponse> queryResponseTask)
+        public static Task<IEnumerable<ResultEntry>> GetSearchResultEntries(this Task<SingleQueryResponse> queryResponseTask)
         {
-            return queryResponseTask.ContinueWith(c => c.Result.GetShallowSearchResults());
+            return queryResponseTask.ContinueWith(c => c.Result.GetSearchResultEntries());
         }
 
         public static Task<List<ResultEntry>> ToListAsync(this Task<IEnumerable<ResultEntry>> queryResponseTaskEnumerable)
@@ -56,14 +56,14 @@ namespace UnifiedMedicalLanguageSystem
             return queryResponseTaskEnumerable?.ContinueWith(a => a.Result?.ToList());
         }
 
-        public static IEnumerable<T> GetShallowSearchResults<T>(this SingleQueryResponse queryResponse, Func<ResultEntry, T> selector)
+        public static IEnumerable<T> GetSearchResultEntries<T>(this SingleQueryResponse queryResponse, Func<ResultEntry, T> selector)
         {       
-            return queryResponse.GetShallowSearchResults()?.Select(s => selector(s as ResultEntry));
+            return queryResponse.GetSearchResultEntries()?.Select(s => selector(s as ResultEntry));
         }
 
-        public static Task<IEnumerable<T>> GetShallowSearchResults<T>(this Task<SingleQueryResponse> queryResponseTask, Func<ResultEntry, T> selector)
+        public static Task<IEnumerable<T>> GetSearchResultEntries<T>(this Task<SingleQueryResponse> queryResponseTask, Func<ResultEntry, T> selector)
         {
-            return queryResponseTask.ContinueWith(c => c.Result.GetShallowSearchResults(selector));
+            return queryResponseTask.ContinueWith(c => c.Result.GetSearchResultEntries(selector));
         }
 
         public static Task<List<T>> ToListAsync<T>(this Task<IEnumerable<T>> queryResponseTaskSelected)

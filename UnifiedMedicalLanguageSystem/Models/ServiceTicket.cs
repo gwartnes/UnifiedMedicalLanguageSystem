@@ -10,9 +10,9 @@ using System.Xml.Linq;
 
 namespace UnifiedMedicalLanguageSystem
 {
-    internal class ServiceTicket
+    public class ServiceTicket
     {
-        internal string TicketKey { get; set; }
+        public string TicketKey { get; private set; }
         internal DateTime DateGenerated { get; set; }
 
         private string _ticketGrantingTicketKey;
@@ -70,7 +70,7 @@ namespace UnifiedMedicalLanguageSystem
             }
         }
 
-        internal async Task<bool> ValidateAsync(Guid apiKey)
+        public async Task<bool> ValidateAsync(Guid apiKey)
         {
             var client = new HttpClient();
             var uri = new Uri($"https://utslogin.nlm.nih.gov/cas/serviceValidate?ticket={TicketKey}&service={_service}");

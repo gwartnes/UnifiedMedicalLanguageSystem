@@ -9,7 +9,7 @@ using Amoenus.PclTimer;
 
 namespace UnifiedMedicalLanguageSystem
 {
-    internal class TicketGrantingTicket
+    public class TicketGrantingTicket
     {
         public string TicketKey { get; internal set; }
         internal DateTime DateGenerated { get; set; }
@@ -65,7 +65,7 @@ namespace UnifiedMedicalLanguageSystem
             return new TicketGrantingTicket(apiKey, await GetTicketGeneratingTicketKey(apiKey), DateTime.Now);
         }
 
-        internal async Task<ServiceTicket> GetServiceTicket(string service = "http://umlsks.nlm.nih.gov")
+        public async Task<ServiceTicket> GetServiceTicket(string service = "http://umlsks.nlm.nih.gov")
         {
             return await ServiceTicket.CreateAsync(service, TicketKey);
         }

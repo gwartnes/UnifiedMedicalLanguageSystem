@@ -8,7 +8,7 @@ namespace UnifiedMedicalLanguageSystem
 {
     public class UMLS
     {
-        internal TicketGrantingTicket TGT { get; set; }
+        public TicketGrantingTicket TGT { get; internal set; }
 
         private UMLS(TicketGrantingTicket tgt)
         {
@@ -23,6 +23,14 @@ namespace UnifiedMedicalLanguageSystem
         /// <returns>An awaitable Task which represents </returns>
         public static async Task<UMLS> CreateAsync(string apiKey)
         {
+            var apiKeyGuid = ValidateAPIKey(apiKey);
+            var tgt = await TicketGrantingTicket.CreateAsync(apiKeyGuid);
+            await ValidateTGT(tgt);
+            return new UMLS(tgt);
+        }
+
+        private static Guid ValidateAPIKey(string apiKey)
+        {
             if (string.IsNullOrWhiteSpace(apiKey))
             {
                 throw new ArgumentNullException("The value for the apiKey parameter should not be null.");
@@ -32,14 +40,17 @@ namespace UnifiedMedicalLanguageSystem
             {
                 throw new FormatException("The supplied API key is not in a correct format.");
             }
-            var tgt = await TicketGrantingTicket.CreateAsync(apiKeyGuid);
 
+            return apiKeyGuid;
+        }
+
+        private static async Task ValidateTGT(TicketGrantingTicket tgt)
+        {
             var serviceTicket = await tgt.GetServiceTicket();
             if (!await serviceTicket.ValidateAsync(tgt.ApiKey))
             {
                 throw new Exception("Invalid TGT/ST.");
             }
-            return new UMLS(tgt);
         }
 
         public async Task<SingleQueryResponse> Search(string term, SearchOptions options = null)

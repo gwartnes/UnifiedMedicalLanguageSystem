@@ -57,7 +57,7 @@ namespace UnifiedMedicalLanguageSystem.TestClient
         {
             w("Enter a search term: ");
             var term = r();
-            var result = umls.Search(term, new SearchOptions(RootSource.CSP) { PageSize = 10 }).GetShallowSearchResults().GetAwaiter().GetResult() as IEnumerable<ResultEntry>;
+            var result = umls.Search(term, new SearchOptions(RootSource.CSP) { PageSize = 10 }).GetSearchResultEntries().GetAwaiter().GetResult() as IEnumerable<ResultEntry>;
             w(JsonConvert.SerializeObject(result, Formatting.Indented, new StringEnumConverter()));
         }
 
